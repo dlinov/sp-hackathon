@@ -17,7 +17,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scalaz.OptionT
 import scalaz.std.scalaFuture._
 
-@Api(value = "/users")
+@Api(value = "/sponsors")
 trait SponsorRoutes extends JsonSupport {
   import HLCJsonProtocol._
   import io.github.dlinov.model.Implicits._
@@ -35,8 +35,8 @@ trait SponsorRoutes extends JsonSupport {
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "userId", required = false, dataType = "string", paramType = "path", value = "ID of user that needs to be fetched")
   ))
-  lazy val userRoutes: Route =
-    pathPrefix("sponsor") {
+  lazy val sponsorRoutes: Route =
+    pathPrefix("sponsors") {
       concat(
         path("reward") {
           post {

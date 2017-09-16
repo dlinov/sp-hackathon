@@ -17,7 +17,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-object Boot extends App with AppSettings with UserRoutes with ProjectRoutes {
+object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with SponsorRoutes {
   implicit val system: ActorSystem = ActorSystem("sp-system")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
@@ -29,11 +29,15 @@ object Boot extends App with AppSettings with UserRoutes with ProjectRoutes {
   override val db = mongoClient.getDatabase(dbName).withCodecRegistry(ModelMongoCodecs.codecRegistry)
 
   val SwaggerDocService = new SwaggerHttpService {
-    override val apiClasses: Set[Class[_]] = Set(classOf[SponsorRoutes])
+    override val apiClasses: Set[Class[_]] = Set(
+      classOf[SponsorRoutes],
+      classOf[UserRoutes],
+      classOf[ProjectRoutes]
+    )
     override val apiDocsPath = "swagger" //where you want the swagger-json endpoint exposed
   }
 
-  lazy val routess: Route = concat(userRoutes, projectRoutes, SwaggerDocService.routes)
+  lazy val routess: Route = concat(userRoutes, projectRoutes, sponsorRoutes, SwaggerDocService.routes)
 
   val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routess, host, port)
   serverBindingFuture.onComplete {

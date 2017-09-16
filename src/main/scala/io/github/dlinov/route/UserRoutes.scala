@@ -63,6 +63,13 @@ trait UserRoutes extends JsonSupport {
               }
             }
           }
+        },
+        pathEnd {
+          get {
+            complete {
+              dao.findAll.map(_.map(_.asUI))
+            }
+          }
         }
       )
     }
