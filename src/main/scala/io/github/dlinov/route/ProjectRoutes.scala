@@ -1,14 +1,14 @@
 package io.github.dlinov.route
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.server.Directives.{as, concat, entity, parameter, pathEnd, pathPrefix, rejectEmptyResponse}
-import akka.http.scaladsl.server.{PathMatchers, Route}
+import akka.http.scaladsl.server.Directives.{as, concat, entity, pathEnd, pathPrefix, rejectEmptyResponse}
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.{get, post}
-import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.{ProjectsMongoDao, UsersMongoDao}
+import io.github.dlinov.db.mongo.ProjectsMongoDao
 import io.github.dlinov.json.JsonSupport
+import io.github.dlinov.model.ui.UiNewProject
 import io.swagger.annotations.Api
 import org.mongodb.scala.MongoDatabase
 
@@ -30,13 +30,22 @@ trait ProjectRoutes extends JsonSupport {
     pathPrefix("projects") {
       concat(
         pathEnd {
-          get {
-            rejectEmptyResponse {
-              complete {
-                projectsDao.findAll.map(_.map(_.asUI))
+          concat(
+            get {
+              rejectEmptyResponse {
+                complete {
+                  projectsDao.findAll.map(_.map(_.asUI))
+                }
+              }
+            },
+            post {
+              entity(as[UiNewProject]) { project ⇒
+                complete {
+                  projectsDao.createProject(project.toProject).map(_.asUI)
+                }
               }
             }
-          }
+          )
         }
       )
     }

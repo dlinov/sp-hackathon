@@ -1,6 +1,7 @@
 package io.github.dlinov.db.mongo
 
 import org.bson.types.ObjectId
+import org.mongodb.scala.bson.collection.immutable.Document
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.{Completed, MongoCollection, MongoDatabase}
@@ -26,6 +27,8 @@ abstract class MongoDao[T](db: MongoDatabase) {
   protected def find(filter: Bson): Future[Seq[T]] = {
     collection.find(filter).toFuture()
   }
+
+  def findAll: Future[Seq[T]] = find(Document.empty)
 
   def findById(id: String): Future[Option[T]] = {
     findOne(equal(fId, new ObjectId(id)))
