@@ -2,14 +2,14 @@ package io.github.dlinov.db.mongo
 
 import io.github.dlinov.db.UsersDao
 import io.github.dlinov.model.User
-import org.mongodb.scala.MongoClient
+import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.model.Filters._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
-class UsersMongoDao(mongoClient: MongoClient)
-                   (implicit ec: ExecutionContext) extends MongoDao[User](mongoClient) with UsersDao {
+class UsersMongoDao(db: MongoDatabase)
+                   (implicit ec: ExecutionContext) extends MongoDao[User](db) with UsersDao {
   import UsersMongoDao.FieldNames._
 
   override implicit def classTag: ClassTag[User] = ClassTag[User](classOf[User])

@@ -10,7 +10,7 @@ import akka.util.Timeout
 import io.github.dlinov.db.mongo.UsersMongoDao
 import io.github.dlinov.json.JsonSupport
 import io.github.dlinov.model.ui.UiNewUser
-import org.mongodb.scala.MongoClient
+import org.mongodb.scala.MongoDatabase
 
 import scala.concurrent.ExecutionContext
 
@@ -22,8 +22,8 @@ trait UserRoutes extends JsonSupport {
   implicit def executionContext: ExecutionContext
   implicit def timeout: Timeout
 
-  val mongoClient: MongoClient
-  lazy val dao = new UsersMongoDao(mongoClient)
+  val db: MongoDatabase
+  lazy val dao = new UsersMongoDao(db)
 
   lazy val userRoutes: Route =
     pathPrefix("users") {

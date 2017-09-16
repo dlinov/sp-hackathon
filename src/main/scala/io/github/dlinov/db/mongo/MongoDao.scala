@@ -3,18 +3,17 @@ package io.github.dlinov.db.mongo
 import org.bson.types.ObjectId
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
-import org.mongodb.scala.{Completed, MongoClient, MongoCollection, MongoDatabase}
+import org.mongodb.scala.{Completed, MongoCollection, MongoDatabase}
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
 
-abstract class MongoDao[T](mongoClient: MongoClient) {
+abstract class MongoDao[T](db: MongoDatabase) {
   import MongoDao.FieldNames._
 
   def collectionName: String
 
   implicit def classTag: ClassTag[T]
-  val db: MongoDatabase = mongoClient.getDatabase("mydb").withCodecRegistry(ModelMongoCodecs.codecRegistry)
   def collection: MongoCollection[T] = db.getCollection[T](collectionName)
 
   protected def findOne(filter: Bson): Future[T] = {

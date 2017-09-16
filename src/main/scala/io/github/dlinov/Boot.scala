@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives.concat
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import io.github.dlinov.db.mongo.ModelMongoCodecs
 import io.github.dlinov.route.UserRoutes
 import org.mongodb.scala.MongoClient
 
@@ -23,6 +24,7 @@ object Boot extends App with AppSettings with UserRoutes {
   val host = "0.0.0.0"
   val dbName = mongodbUri.split("/").last
   val mongoClient: MongoClient = MongoClient(mongodbUri)
+  override val db = mongoClient.getDatabase(dbName).withCodecRegistry(ModelMongoCodecs.codecRegistry)
 
   lazy val routes: Route = concat(userRoutes)
 
