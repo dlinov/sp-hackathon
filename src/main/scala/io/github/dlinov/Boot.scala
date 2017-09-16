@@ -7,6 +7,7 @@ import akka.http.scaladsl.server.Directives.concat
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import com.github.swagger.akka.SwaggerHttpService
 import io.github.dlinov.db.mongo.ModelMongoCodecs
 import io.github.dlinov.route.UserRoutes
 import org.mongodb.scala.MongoClient
@@ -26,9 +27,14 @@ object Boot extends App with AppSettings with UserRoutes {
   val mongoClient: MongoClient = MongoClient(mongodbUri)
   override val db = mongoClient.getDatabase(dbName).withCodecRegistry(ModelMongoCodecs.codecRegistry)
 
-  lazy val routes: Route = concat(userRoutes)
+  val SwaggerDocService = new SwaggerHttpService {
+    override val apiClasses: Set[Class[_]] = Set(classOf[UserRoutes])
+    override val apiDocsPath = "swagger" //where you want the swagger-json endpoint exposed
+  }
 
-  val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routes, host, port)
+  lazy val routess: Route = concat(userRoutes, SwaggerDocService.routes)
+
+  val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routess, host, port)
   serverBindingFuture.onComplete {
     case Success(ok) ⇒ println(s"Successfully binded: $ok")
     case Failure(ex) ⇒ println(s"Couldn't bind: $ex")
