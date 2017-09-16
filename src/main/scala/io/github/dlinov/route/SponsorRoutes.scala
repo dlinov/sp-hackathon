@@ -7,16 +7,16 @@ import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.UsersMongoDao
+import io.github.dlinov.db.mongo.{RewardsMongoDao, SponsorsMongoDao, UsersMongoDao}
 import io.github.dlinov.json.JsonSupport
-import io.github.dlinov.model.{UiNewUser, UiUser}
+import io.github.dlinov.model.{UiNewReward, UiNewUser, UiUser}
 import io.swagger.annotations._
 import org.mongodb.scala.MongoDatabase
 
 import scala.concurrent.ExecutionContext
 
 @Api(value = "/users")
-trait UserRoutes extends JsonSupport {
+trait SponsorRoutes extends JsonSupport {
   import HLCJsonProtocol._
   import io.github.dlinov.model.Implicits._
 
@@ -25,30 +25,29 @@ trait UserRoutes extends JsonSupport {
   implicit def timeout: Timeout
 
   val db: MongoDatabase
-  lazy val dao = new UsersMongoDao(db)
+  lazy val sponsorsDao = new SponsorsMongoDao(db)
+  lazy val rewardDao = new RewardsMongoDao(db)
 
   @ApiOperation(httpMethod = "GET", response = classOf[UiUser], value = "Returns an user based on ID")
   @ApiImplicitParams(Array(
     new ApiImplicitParam(name = "userId", required = false, dataType = "string", paramType = "path", value = "ID of user that needs to be fetched")
   ))
   lazy val userRoutes: Route =
-    pathPrefix("users") {
+    pathPrefix("sponsor") {
       concat(
-        path("register") {
+        path("reward") {
           post {
-            entity(as[UiNewUser]) { user ⇒
-              dao.createUser(user.toUser)
+            entity(as[UiNewReward]) { reward ⇒
+              rewardDao.insert(reward.toReward)
               complete("done")
             }
           }
-        },
-        pathPrefix("login") {
-          parameter("email", "pass") { (email, pass) =>
-            pathEnd {
-              rejectEmptyResponse {
-                complete {
-                  dao.login(email, pass).map(_.map(_.asUI))
-                }
+        }/*,
+        parameter("userId") { userId =>
+          pathEnd {
+            rejectEmptyResponse {
+              complete {
+                sponsorsDao.findById(userId).map(_.map(_.asUI))
               }
             }
           }
@@ -63,7 +62,7 @@ trait UserRoutes extends JsonSupport {
               }
             }
           }
-        }
+        }*/
       )
     }
 }

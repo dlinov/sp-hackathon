@@ -7,8 +7,8 @@ import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 class RewardsMongoDao(db: MongoDatabase)
-                     (override implicit val ec: ExecutionContext) extends MongoDao[Organization](db) {
+                     (override implicit val ec: ExecutionContext) extends MongoDao[Reward](db) {
   override def collectionName: String = "rewards"
 
-  override implicit val classTag: ClassTag[Organization] = ClassTag(classOf[Reward])
+  override implicit val classTag: ClassTag[Reward] = ClassTag(classOf[Reward])
 }

@@ -1,6 +1,6 @@
 package io.github.dlinov.model
 
-import io.github.dlinov.model.ui.{UiProject, UiUser}
+import io.github.dlinov.model.ui.UiProject
 
 object Implicits {
 

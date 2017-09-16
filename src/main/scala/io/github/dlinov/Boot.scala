@@ -10,6 +10,7 @@ import akka.util.Timeout
 import com.github.swagger.akka.SwaggerHttpService
 import io.github.dlinov.db.mongo.ModelMongoCodecs
 import io.github.dlinov.route.{ProjectRoutes, UserRoutes}
+import io.github.dlinov.route.SponsorRoutes
 import org.mongodb.scala.MongoClient
 
 import scala.concurrent.duration._
@@ -28,7 +29,7 @@ object Boot extends App with AppSettings with UserRoutes with ProjectRoutes {
   override val db = mongoClient.getDatabase(dbName).withCodecRegistry(ModelMongoCodecs.codecRegistry)
 
   val SwaggerDocService = new SwaggerHttpService {
-    override val apiClasses: Set[Class[_]] = Set(classOf[UserRoutes])
+    override val apiClasses: Set[Class[_]] = Set(classOf[SponsorRoutes])
     override val apiDocsPath = "swagger" //where you want the swagger-json endpoint exposed
   }
 
