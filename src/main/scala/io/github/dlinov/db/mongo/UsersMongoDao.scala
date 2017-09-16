@@ -12,7 +12,7 @@ class UsersMongoDao(mongoClient: MongoClient)
                    (implicit ec: ExecutionContext) extends MongoDao[User](mongoClient) with UsersDao {
   import UsersMongoDao.FieldNames._
 
-  override implicit def classTag: ClassTag[User] = ???
+  override implicit def classTag: ClassTag[User] = ClassTag[User](classOf[User])
 
   override val collectionName = "users"
 

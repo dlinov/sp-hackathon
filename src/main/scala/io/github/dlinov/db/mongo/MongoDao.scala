@@ -18,13 +18,11 @@ abstract class MongoDao[T](mongoClient: MongoClient) {
   def collection: MongoCollection[T] = db.getCollection[T](collectionName)
 
   protected def findOne(filter: Bson): Future[T] = {
-    ???
-//    collection.find(filter).first().toFuture()
+    collection.find(filter).first().toFuture()
   }
 
   protected def find(filter: Bson): Future[Seq[T]] = {
-    ???
-//    collection.find(filter).toFuture()
+    collection.find(filter).toFuture()
   }
 
   def findById(id: String): Future[T] = {
