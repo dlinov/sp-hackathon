@@ -4,7 +4,7 @@ import java.util.UUID
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.DateTime
-import io.github.dlinov.model.{UiNewReward, UiNewUser, UiUser}
+import io.github.dlinov.model._
 import io.github.dlinov.model.ui._
 import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, JsonFormat, RootJsonFormat}
 
@@ -41,6 +41,8 @@ trait JsonSupport extends SprayJsonSupport {
     implicit val uiNewUserFormat: RootJsonFormat[UiNewUser] = jsonFormat4(UiNewUser)
     implicit val uiProjectFormat: RootJsonFormat[UiProject] = jsonFormat7(UiProject)
     implicit val uiNewProjectFormat: RootJsonFormat[UiNewProject] = jsonFormat4(UiNewProject)
-    implicit val rewardFormat: RootJsonFormat[UiNewReward] = jsonFormat3(UiNewReward)
+    implicit val newRewardFormat: RootJsonFormat[UiNewReward] = jsonFormat3(UiNewReward)
+    implicit val rewardFormat: RootJsonFormat[UiReward] = jsonFormat4(UiReward.apply)
+    implicit val sponsorFormat: RootJsonFormat[UiSponsor] = jsonFormat5(UiSponsor.apply)
   }
 }

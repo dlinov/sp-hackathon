@@ -34,6 +34,10 @@ abstract class MongoDao[T](db: MongoDatabase) {
     findOne(equal(fId, new ObjectId(id)))
   }
 
+  def findByIds(ids: Seq[String]): Future[Seq[T]] = {
+    find(in(fId, ids.map(new ObjectId(_))))
+  }
+
   def insert(obj: T): Future[Completed] = {
     collection.insertOne(obj).toFuture()
   }

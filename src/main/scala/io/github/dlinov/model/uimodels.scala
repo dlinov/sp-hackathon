@@ -1,7 +1,5 @@
 package io.github.dlinov.model
 
-import java.util.UUID
-
 import org.bson.types.ObjectId
 import org.mongodb.scala.bson.ObjectId
 
@@ -27,12 +25,36 @@ case class UiVolunteer(
 
 case class UiSponsor(
                       id: String,
-                      rewardIds: Seq[ObjectId],
+                      rewards: Seq[UiReward],
                       email: String,
-                      password: String,
                       firstName: String,
                       lastName: String
                     )
+
+object UiSponsor {
+  def apply2(user: User, rewards: Seq[Reward]): UiSponsor = {
+    import user._
+
+    UiSponsor(
+      _id.toString,
+      rewards.map(UiReward(_)),
+      email,
+      firstName,
+      lastName
+    )
+  }
+}
+
+case class UiReward(
+                     id: String, title: String, price: Int, code: Option[String]
+                   )
+
+object UiReward {
+  def apply(reward: Reward): UiReward = {
+    import reward._
+    new UiReward(_id.toString, title, price, code)
+  }
+}
 
 case class UiNewReward(title: String, price: Int, code: Option[String]) {
   def toReward = Reward(ObjectId.get(), title, price, code)

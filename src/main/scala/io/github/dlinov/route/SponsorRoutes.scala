@@ -9,11 +9,13 @@ import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
 import io.github.dlinov.db.mongo.{RewardsMongoDao, SponsorsMongoDao, UsersMongoDao}
 import io.github.dlinov.json.JsonSupport
-import io.github.dlinov.model.{UiNewReward, UiNewUser, UiUser}
+import io.github.dlinov.model.{UiNewReward, UiNewUser, UiSponsor, UiUser}
 import io.swagger.annotations._
 import org.mongodb.scala.MongoDatabase
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
+import scalaz.OptionT
+import scalaz.std.scalaFuture._
 
 @Api(value = "/users")
 trait SponsorRoutes extends JsonSupport {
@@ -27,6 +29,7 @@ trait SponsorRoutes extends JsonSupport {
   val db: MongoDatabase
   lazy val sponsorsDao = new SponsorsMongoDao(db)
   lazy val rewardDao = new RewardsMongoDao(db)
+  lazy val usersDao = new UsersMongoDao(db)
 
   @ApiOperation(httpMethod = "GET", response = classOf[UiUser], value = "Returns an user based on ID")
   @ApiImplicitParams(Array(
@@ -42,27 +45,23 @@ trait SponsorRoutes extends JsonSupport {
               complete("done")
             }
           }
-        }/*,
-        parameter("userId") { userId =>
-          pathEnd {
-            rejectEmptyResponse {
-              complete {
-                sponsorsDao.findById(userId).map(_.map(_.asUI))
-              }
-            }
-          }
         },
-        pathPrefix(PathMatchers.Segment) { id ⇒
-          get {
+        pathPrefix("rewards") {
+          parameter("userId") { userId =>
             pathEnd {
               rejectEmptyResponse {
                 complete {
-                  dao.findUser(id).map(_.map(_.asUI))
+                  val x: OptionT[Future, UiSponsor] = for {
+                    sponsor <- OptionT(sponsorsDao.findById(userId))
+                    user <- OptionT(usersDao.findById(userId))
+                    rewards <- OptionT(rewardDao.findByIds(sponsor.rewardIds.map(_.toString)).map(Option(_)))
+                  } yield UiSponsor.apply2(user, rewards)
+                  x.run
                 }
               }
             }
           }
-        }*/
+        }
       )
     }
 }
