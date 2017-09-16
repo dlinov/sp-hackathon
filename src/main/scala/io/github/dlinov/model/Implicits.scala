@@ -1,6 +1,6 @@
 package io.github.dlinov.model
 
-import io.github.dlinov.model.ui.UiUser
+import io.github.dlinov.model.ui.{UiProject, UiUser}
 
 object Implicits {
 
@@ -10,6 +10,18 @@ object Implicits {
       u.email,
       u.firstName,
       u.lastName
+    )
+  }
+
+  implicit class ProjectConverter(p: Project) {
+    def asUI: UiProject = UiProject(
+      id = p._id.toString,
+      title = p.title,
+      description = p.description,
+      price = p.price,
+      bonus = p.bonus,
+      isFinished = p.isFinished,
+      volunteerIds = p.volunteerIds.map(_.toString)
     )
   }
 }

@@ -9,7 +9,7 @@ import org.bson.codecs.configuration.CodecRegistry
 object ModelMongoCodecs {
   val codecRegistry: CodecRegistry = fromRegistries(
     fromProviders(
-      classOf[Organization], classOf[Reward], classOf[Sponsor], classOf[Task], classOf[User], classOf[Volunteer]
+      classOf[Organization], classOf[Reward], classOf[Sponsor], classOf[Project], classOf[User], classOf[Volunteer]
     ),
     DEFAULT_CODEC_REGISTRY
   )
