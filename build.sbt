@@ -1,3 +1,7 @@
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging
+
+enablePlugins(JavaAppPackaging)
+
 lazy val akkaHttpVersion = "10.0.9"
 
 lazy val root = (project in file(".")).
