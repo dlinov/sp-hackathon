@@ -1,6 +1,6 @@
 package io.github.dlinov
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives.concat
@@ -10,8 +10,8 @@ import akka.util.Timeout
 import io.github.dlinov.route.UserRoutes
 import org.mongodb.scala.MongoClient
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object Boot extends App with AppSettings with UserRoutes {
@@ -22,7 +22,7 @@ object Boot extends App with AppSettings with UserRoutes {
 
   val host = "0.0.0.0"
   val dbName = mongodbUri.split("/").last
-  val mongoClient = MongoClient(mongodbUri).getDatabase(dbName)
+  val mongoClient: MongoClient = MongoClient(mongodbUri)
 
   lazy val routes: Route = concat(userRoutes)
 
@@ -31,11 +31,5 @@ object Boot extends App with AppSettings with UserRoutes {
     case Success(ok) ⇒ println(s"Successfully binded: $ok")
     case Failure(ex) ⇒ println(s"Couldn't bind: $ex")
   }
-//  println(s"Server online at http://$host:$port/\nPress RETURN to stop...")
-//  scala.io.StdIn.readLine()
-//  serverBindingFuture
-//    .flatMap(_.unbind())
-//    .onComplete { done ⇒
-//      done.failed.map { ex ⇒ system.log.error(ex, "Failed unbinding") }
-//    }
+
 }

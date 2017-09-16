@@ -5,7 +5,7 @@ import java.util.UUID
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.DateTime
 import io.github.dlinov.model.ui._
-import spray.json.{ DefaultJsonProtocol, DeserializationException, JsString, JsValue, JsonFormat, RootJsonFormat }
+import spray.json.{DefaultJsonProtocol, DeserializationException, JsString, JsValue, JsonFormat, RootJsonFormat}
 
 trait JsonSupport extends SprayJsonSupport {
   object HLCJsonProtocol extends DefaultJsonProtocol {
@@ -19,19 +19,6 @@ trait JsonSupport extends SprayJsonSupport {
           throw DeserializationException("Expected UUID as JsString, but got " + x)
       }
     }
-
-//    implicit object CurrencyJsonFormat extends JsonFormat[Currency] {
-//      def write(x: Currency) = JsString(x.toString)
-//
-//      def read(value: JsValue): Currency = value match {
-//        case JsString("EUR") ⇒
-//          Currency.EUR
-//        case JsString("USD") ⇒
-//          Currency.USD
-//        case x ⇒
-//          throw DeserializationException("Expected currency code as JsString, but got " + x)
-//      }
-//    }
 
     implicit object DateJsonFormat extends RootJsonFormat[DateTime] {
       override def write(obj: DateTime) = JsString(obj.toIsoDateTimeString())
@@ -50,6 +37,6 @@ trait JsonSupport extends SprayJsonSupport {
     }
 
     implicit val uiUserJsonFormat: RootJsonFormat[UiUser] = jsonFormat4(UiUser)
-    implicit val uiNewUserFormat: RootJsonFormat[UiNewUser] = jsonFormat3(UiNewUser)
+    implicit val uiNewUserFormat: RootJsonFormat[UiNewUser] = jsonFormat4(UiNewUser)
   }
 }

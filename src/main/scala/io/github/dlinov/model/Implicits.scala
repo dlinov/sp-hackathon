@@ -6,10 +6,10 @@ object Implicits {
 
   implicit class UserConverter(u: User) {
     def asUI: UiUser = UiUser(
-      id = Option(u._id).map(_.toString),
-      email = u.email,
-      firstName = u.firstName,
-      lastName = u.lastName
+      u._id.toString,
+      u.email,
+      u.firstName,
+      u.lastName
     )
   }
 }

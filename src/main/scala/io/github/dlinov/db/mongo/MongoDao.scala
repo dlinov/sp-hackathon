@@ -1,9 +1,9 @@
 package io.github.dlinov.db.mongo
 
-import io.github.dlinov.model.User
-import org.mongodb.scala.{Completed, MongoClient, MongoCollection, MongoDatabase}
+import org.bson.types.ObjectId
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.{Completed, MongoClient, MongoCollection, MongoDatabase}
 
 import scala.concurrent.Future
 import scala.reflect.ClassTag
@@ -26,7 +26,7 @@ abstract class MongoDao[T](mongoClient: MongoClient) {
   }
 
   def findById(id: String): Future[T] = {
-    findOne(equal(fId, id))
+    findOne(equal(fId, new ObjectId(id)))
   }
 
   def insert(obj: T): Future[Completed] = {

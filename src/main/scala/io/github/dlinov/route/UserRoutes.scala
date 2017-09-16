@@ -1,26 +1,29 @@
 package io.github.dlinov.route
 
-import akka.actor.{ ActorRef, ActorSystem }
-import akka.event.Logging
-import akka.http.scaladsl.server.Directives.{ as, concat, entity, pathEnd, pathPrefix, rejectEmptyResponse }
-import akka.http.scaladsl.server.PathMatchers.JavaUUID
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.directives.MethodDirectives.{ get, post }
-import akka.http.scaladsl.server.directives.ParameterDirectives._
+import akka.actor.ActorSystem
+import akka.http.scaladsl.server.Directives.{as, concat, entity, pathEnd, pathPrefix, rejectEmptyResponse}
+import akka.http.scaladsl.server.directives.MethodDirectives.{get, post}
 import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
+import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
+import io.github.dlinov.db.mongo.UsersMongoDao
 import io.github.dlinov.json.JsonSupport
-import io.github.dlinov.model.ui.{ UiNewUser, UiUser }
+import io.github.dlinov.model.ui.UiNewUser
+import org.mongodb.scala.MongoClient
 
 import scala.concurrent.ExecutionContext
 
 trait UserRoutes extends JsonSupport {
   import HLCJsonProtocol._
+  import io.github.dlinov.model.Implicits._
 
   implicit def system: ActorSystem
   implicit def executionContext: ExecutionContext
   implicit def timeout: Timeout
+
+  val mongoClient: MongoClient
+  lazy val dao = new UsersMongoDao(mongoClient)
 
   lazy val userRoutes: Route =
     pathPrefix("users") {
@@ -28,17 +31,18 @@ trait UserRoutes extends JsonSupport {
         path("register") {
           post {
             entity(as[UiNewUser]) { user ⇒
-              ???
-//              complete(new UserService(db).registerUser(user))
+              dao.createUser(user.toUser)
+              complete("done")
             }
           }
         },
-        pathPrefix(JavaUUID) { id ⇒
+        pathPrefix(PathMatchers.Segment) { id ⇒
           get {
             pathEnd {
               rejectEmptyResponse {
-                ???
-//                complete(new UserService(db).findUser(id))
+                complete {
+                  dao.findUser(id).map(_.asUI)
+                }
               }
             }
           }
