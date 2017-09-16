@@ -41,7 +41,7 @@ trait UserRoutes extends JsonSupport {
             pathEnd {
               rejectEmptyResponse {
                 complete {
-                  dao.findUser(id).map(_.asUI)
+                  dao.findUser(id).map(_.map(_.asUI))
                 }
               }
             }
