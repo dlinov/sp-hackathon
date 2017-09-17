@@ -17,7 +17,7 @@ case class UiUser(
 
 case class UiVolunteer(
                         id: String,
-                        completedTaskIds: ObjectId,
+                        completedProjects: Seq[UiProject],
                         email: String,
                         password: String,
                         firstName: String,
@@ -70,5 +70,6 @@ case class UiNewOrganization(title: String, email: String, password: String) {
     balance = 0,
     taskIds = Seq.empty
   )
-
 }
+
+case class UiVolunteerApplication(userId: String, projectId: String)

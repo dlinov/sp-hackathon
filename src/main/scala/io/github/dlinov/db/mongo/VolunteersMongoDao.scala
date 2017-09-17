@@ -17,7 +17,13 @@ class VolunteersMongoDao(db: MongoDatabase)(override implicit val ec: ExecutionC
 
   override def collectionName: String = "volunteers"
 
-  def addPointsTo(volunteerIds: Seq[ObjectId], points: Int): Future[UpdateResult] = {
-    collection.updateMany(in(fId, volunteerIds: _*), inc("balance", points)).toFuture
+  def addPointsTo(volunteerIds: Seq[ObjectId], points: Int): Future[Option[UpdateResult]] = {
+    collection.updateMany(in(fId, volunteerIds: _*), inc("balance", points))
+      .toFuture.map(Option(_))
+  }
+
+  def createVolunteer(volunteer: Volunteer): Future[Volunteer] = {
+    // volunteer is expected to have unique (user) id
+    insert(volunteer).map(_ ⇒ volunteer)
   }
 }

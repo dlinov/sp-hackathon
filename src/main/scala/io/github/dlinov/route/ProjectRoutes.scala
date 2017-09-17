@@ -14,6 +14,8 @@ import io.swagger.annotations.Api
 import org.mongodb.scala.MongoDatabase
 
 import scala.concurrent.{ExecutionContext, Future}
+import scalaz.OptionT
+import scalaz.std.scalaFuture._
 
 @Api(value = "/projects")
 trait ProjectRoutes extends JsonSupport {
@@ -36,10 +38,10 @@ trait ProjectRoutes extends JsonSupport {
           path("complete") {
             put {
               complete {
-                for {
-                  finishedProject ← projectsDao.finishProject(id)
-                  _ ← volunteersDao.addPointsTo(finishedProject.volunteerIds, finishedProject.price)
-                } yield finishedProject.asUI
+                (for {
+                  finishedProject ← OptionT(projectsDao.finishProject(id))
+                  _ ← OptionT(volunteersDao.addPointsTo(finishedProject.volunteerIds, finishedProject.price))
+                } yield finishedProject.asUI).run
               }
             }
           }

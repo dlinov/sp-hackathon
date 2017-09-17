@@ -30,4 +30,12 @@ case class User(
                  lastName: String
                ) extends MongoObject
 
-case class Volunteer(_id: ObjectId, completedTaskIds: ObjectId, balance: Int) extends MongoObject
+case class Volunteer(_id: ObjectId, completedTaskIds: Seq[ObjectId], balance: Int) extends MongoObject
+
+object Volunteer {
+  def create(userId: ObjectId): Volunteer = Volunteer(
+    _id = userId,
+    completedTaskIds = Seq.empty,
+    balance = 0
+  )
+}

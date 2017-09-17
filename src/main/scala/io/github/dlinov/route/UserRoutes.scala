@@ -7,9 +7,9 @@ import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.UsersMongoDao
+import io.github.dlinov.db.mongo.{UsersMongoDao, VolunteersMongoDao}
 import io.github.dlinov.json.JsonSupport
-import io.github.dlinov.model.{UiNewUser, UiUser}
+import io.github.dlinov.model.{UiNewUser, UiUser, Volunteer}
 import io.swagger.annotations._
 import org.mongodb.scala.MongoDatabase
 
@@ -26,6 +26,7 @@ trait UserRoutes extends JsonSupport {
 
   val db: MongoDatabase
   lazy val dao = new UsersMongoDao(db)
+  private lazy val volunteersDao = new VolunteersMongoDao(db)
 
   @ApiOperation(httpMethod = "GET", response = classOf[UiUser], value = "Returns an user based on ID")
   @ApiImplicitParams(Array(
@@ -37,8 +38,13 @@ trait UserRoutes extends JsonSupport {
         path("register") {
           post {
             entity(as[UiNewUser]) { user ⇒
-              dao.createUser(user.toUser)
-              complete("done")
+              complete {
+                for {
+                  createdUser ← dao.createUser(user.toUser)
+                  volunteer = Volunteer.create(createdUser._id)
+                  createdVolunteer ← volunteersDao.createVolunteer(volunteer)
+                } yield createdVolunteer.asUI(createdUser, Seq.empty)
+              }
             }
           }
         },

@@ -16,7 +16,7 @@ class UsersMongoDao(db: MongoDatabase)
 
   def findUser(id: String): Future[Option[User]] = findById(id)
 
-  def createUser(user: User): Future[Unit] = insert(user).map(_ ⇒ ())
+  def createUser(user: User): Future[User] = insert(user).map(_ ⇒ user)
 
   def login(email: String, password: String): Future[Option[User]] = {
     findOne(and(equal("email", email), equal("password", password)))

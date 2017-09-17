@@ -33,4 +33,15 @@ object Implicits {
       projects = projects
     )
   }
+
+  implicit class VolunteerConverter(v: Volunteer) {
+    def asUI(user: User, projects: Seq[UiProject]) = UiVolunteer(
+      id = v._id.toString,
+      completedProjects = projects,
+      email = user.email,
+      password = user.password,
+      firstName = user.firstName,
+      lastName = user.lastName
+    )
+  }
 }
