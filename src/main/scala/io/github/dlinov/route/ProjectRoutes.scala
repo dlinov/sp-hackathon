@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives.{as, concat, entity, path, pathEnd, pathPrefix, rejectEmptyResponse}
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.PathMatchers.Segment
-import akka.http.scaladsl.server.directives.MethodDirectives.{get, post, put}
+import akka.http.scaladsl.server.directives.MethodDirectives.{get, post, put, options}
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.util.Timeout
 import io.github.dlinov.db.mongo.{OrganizationsMongoDao, ProjectsMongoDao, VolunteersMongoDao}
@@ -69,6 +69,9 @@ trait ProjectRoutes extends JsonSupport {
                   } yield createdProject.asUI
                 }
               }
+            },
+            options {
+              complete("")
             }
           )
         }
