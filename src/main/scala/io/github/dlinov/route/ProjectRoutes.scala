@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.PathMatchers.Segment
 import akka.http.scaladsl.server.directives.MethodDirectives.{get, post, put}
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.{ProjectsMongoDao, VolunteersMongoDao}
+import io.github.dlinov.db.mongo.{OrganizationsMongoDao, ProjectsMongoDao, VolunteersMongoDao}
 import io.github.dlinov.json.JsonSupport
 import io.github.dlinov.model.ui.UiNewProject
 import io.swagger.annotations.Api
@@ -27,6 +27,7 @@ trait ProjectRoutes extends JsonSupport {
   val db: MongoDatabase
   lazy val projectsDao = new ProjectsMongoDao(db)
   lazy val volunteersDao = new VolunteersMongoDao(db)
+  lazy val organizationsDao = new OrganizationsMongoDao(db)
 
   lazy val projectRoutes: Route =
     pathPrefix("projects") {
@@ -55,7 +56,10 @@ trait ProjectRoutes extends JsonSupport {
             post {
               entity(as[UiNewProject]) { project ⇒
                 complete {
-                  projectsDao.createProject(project.toProject).map(_.asUI)
+                  for {
+                    createdProject ← projectsDao.createProject(project.toProject)
+                    _ ← organizationsDao.addProjectToOrganization(project.organizationId, createdProject._id)
+                  } yield createdProject.asUI
                 }
               }
             }

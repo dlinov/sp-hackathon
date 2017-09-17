@@ -40,9 +40,11 @@ trait JsonSupport extends SprayJsonSupport {
     implicit val uiUserJsonFormat: RootJsonFormat[UiUser] = jsonFormat4(UiUser)
     implicit val uiNewUserFormat: RootJsonFormat[UiNewUser] = jsonFormat4(UiNewUser)
     implicit val uiProjectFormat: RootJsonFormat[UiProject] = jsonFormat7(UiProject)
-    implicit val uiNewProjectFormat: RootJsonFormat[UiNewProject] = jsonFormat4(UiNewProject)
+    implicit val uiNewProjectFormat: RootJsonFormat[UiNewProject] = jsonFormat5(UiNewProject)
     implicit val newRewardFormat: RootJsonFormat[UiNewReward] = jsonFormat3(UiNewReward)
     implicit val rewardFormat: RootJsonFormat[UiReward] = jsonFormat4(UiReward.apply)
     implicit val sponsorFormat: RootJsonFormat[UiSponsor] = jsonFormat5(UiSponsor.apply)
+    implicit val newOrganizationFormat: RootJsonFormat[UiNewOrganization] = jsonFormat3(UiNewOrganization)
+    implicit val organizationFormat: RootJsonFormat[UiOrganization] = jsonFormat4(UiOrganization)
   }
 }

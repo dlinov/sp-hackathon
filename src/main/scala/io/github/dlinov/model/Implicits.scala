@@ -26,8 +26,11 @@ object Implicits {
   }
 
   implicit class OrganizationConverter(o: Organization) {
-    def asUI: UiOrganization(
-
+    def asUI(projects: Seq[UiProject]): UiOrganization = UiOrganization(
+      id = o._id.toString,
+      title = o.title,
+      balance = o.balance,
+      projects = projects
     )
   }
 }

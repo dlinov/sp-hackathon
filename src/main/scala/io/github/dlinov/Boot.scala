@@ -9,15 +9,14 @@ import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.github.swagger.akka.SwaggerHttpService
 import io.github.dlinov.db.mongo.ModelMongoCodecs
-import io.github.dlinov.route.{ProjectRoutes, UserRoutes}
-import io.github.dlinov.route.SponsorRoutes
+import io.github.dlinov.route.{OrganizationRoutes, ProjectRoutes, SponsorRoutes, UserRoutes}
 import org.mongodb.scala.MongoClient
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with SponsorRoutes {
+object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with SponsorRoutes with OrganizationRoutes {
   implicit val system: ActorSystem = ActorSystem("sp-system")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
@@ -37,7 +36,7 @@ object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with
     override val apiDocsPath = "swagger" //where you want the swagger-json endpoint exposed
   }
 
-  lazy val routess: Route = concat(userRoutes, projectRoutes, sponsorRoutes, SwaggerDocService.routes)
+  lazy val routess: Route = concat(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, SwaggerDocService.routes)
 
   val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routess, host, port)
   serverBindingFuture.onComplete {

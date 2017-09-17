@@ -8,7 +8,7 @@ trait MongoObject {
   val _id: ObjectId
 }
 
-case class Organization(_id: ObjectId, taskIds: Seq[ObjectId])
+case class Organization(_id: ObjectId, title: String, balance: Int, taskIds: Seq[ObjectId]) extends MongoObject
 
 case class Project(_id: ObjectId,
                    title: String,
@@ -27,8 +27,7 @@ case class User(
                  email: String,
                  password: String,
                  firstName: String,
-                 lastName: String,
-                 accounts: Seq[UUID]
+                 lastName: String
                ) extends MongoObject
 
 case class Volunteer(_id: ObjectId, completedTaskIds: ObjectId, balance: Int) extends MongoObject

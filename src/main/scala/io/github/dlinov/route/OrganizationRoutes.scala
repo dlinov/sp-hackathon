@@ -6,8 +6,11 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.directives.MethodDirectives.{get, post}
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.OrganizationsMongoDao
+import io.github.dlinov.db.mongo.{OrganizationsMongoDao, ProjectsMongoDao, UsersMongoDao}
 import io.github.dlinov.json.JsonSupport
+import io.github.dlinov.model.{UiNewOrganization, User}
+import io.github.dlinov.model.Implicits.OrganizationConverter
+import org.bson.types.ObjectId
 import org.mongodb.scala.MongoDatabase
 
 import scala.concurrent.ExecutionContext
@@ -22,6 +25,8 @@ trait OrganizationRoutes extends JsonSupport {
 
   val db: MongoDatabase
   private lazy val organizationDao = new OrganizationsMongoDao(db)
+  private lazy val projectsDao = new ProjectsMongoDao(db)
+  private lazy val usersDao = new UsersMongoDao(db)
 
   lazy val organizationRoutes: Route =
     pathPrefix("organizations") {
@@ -31,14 +36,28 @@ trait OrganizationRoutes extends JsonSupport {
             get {
               rejectEmptyResponse {
                 complete {
-                  organizationDao.findAll.map(_.map(_.asUI))
+                  for {
+                    organizations ← organizationDao.findAll
+                    projects ← projectsDao.findAll
+                  } yield {
+                    organizations.map(org ⇒ {
+                      val orgProjects = projects.collect {
+                        case p if org.taskIds.contains(p._id) ⇒ p.asUI
+                      }
+                      org.asUI(orgProjects)
+                    })
+                  }
                 }
               }
             },
             post {
-              entity(as[UiNewOrganization]) { organization ⇒
+              entity(as[UiNewOrganization]) { newOrg ⇒
                 complete {
-                  organizationDao.registerOrganization(organization.toOrganization).map(_.asUI)
+                  val userId = ObjectId.get()
+                  for {
+                    _ ← usersDao.createUser(User(userId, newOrg.email, newOrg.password, newOrg.title, lastName = ""))
+                    organization ← organizationDao.registerOrganization(newOrg.toOrganization(userId))
+                  } yield organization.map(_.asUI(Seq.empty)) // new organization cannot contain projects
                 }
               }
             }

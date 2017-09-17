@@ -5,7 +5,7 @@ import org.bson.types.ObjectId
 import org.mongodb.scala.bson.ObjectId
 
 case class UiNewUser(email: String, password: String, firstName: String, lastName: String) {
-  def toUser = User(ObjectId.get(), email, password, firstName, lastName, Seq())
+  def toUser = User(ObjectId.get(), email, password, firstName, lastName)
 }
 
 case class UiUser(
@@ -61,6 +61,14 @@ case class UiNewReward(title: String, price: Int, code: Option[String]) {
   def toReward = Reward(ObjectId.get(), title, price, code)
 }
 
-case class UiOrganization(id: ObjectId, title: String, projects: Seq[UiProject])
+case class UiOrganization(id: String, title: String, balance: Int, projects: Seq[UiProject])
 
-case class UiNewOrganization(title: String, email: String, password: String)
+case class UiNewOrganization(title: String, email: String, password: String) {
+  def toOrganization(userId: ObjectId): Organization = Organization(
+    _id = userId,
+    title = title,
+    balance = 0,
+    taskIds = Seq.empty
+  )
+
+}
