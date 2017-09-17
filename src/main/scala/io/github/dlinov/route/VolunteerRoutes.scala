@@ -48,8 +48,8 @@ trait VolunteerRoutes extends JsonSupport {
         post {
           complete {
             for {
-              _ ← volunteersDao.buyRewardFor(volunteerId, rewardId)
-              _ ← rewardsDao.assignVolunteerForReward(volunteerId, rewardId)
+              reward ← rewardsDao.assignVolunteerForReward(volunteerId, rewardId)
+              _ ← volunteersDao.buyRewardFor(volunteerId, reward)
             } yield ""
           }
         }

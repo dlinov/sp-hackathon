@@ -18,10 +18,10 @@ class RewardsMongoDao(db: MongoDatabase)
 
   override implicit val classTag: ClassTag[Reward] = ClassTag(classOf[Reward])
 
-  def assignVolunteerForReward(volunteerId: String, rewardId: String): Future[Option[UpdateResult]] = {
+  def assignVolunteerForReward(volunteerId: String, rewardId: String): Future[Option[Reward]] = {
     val volunteerObjId = new ObjectId(volunteerId)
     val rewardObjId = new ObjectId(rewardId)
     collection.updateOne(equal(fId, rewardObjId), set("volunteerId", volunteerObjId))
-      .toFuture.map(Option(_))
+      .toFuture.flatMap(_ ⇒ findById(rewardId))
   }
 }

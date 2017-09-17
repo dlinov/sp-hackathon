@@ -1,7 +1,7 @@
 package io.github.dlinov.db.mongo
 
 import io.github.dlinov.db.mongo.MongoDao.FieldNames.fId
-import io.github.dlinov.model.Volunteer
+import io.github.dlinov.model.{Reward, Volunteer}
 import org.mongodb.scala.MongoDatabase
 import org.mongodb.scala.bson.ObjectId
 import org.mongodb.scala.model.Filters._
@@ -22,11 +22,15 @@ class VolunteersMongoDao(db: MongoDatabase)(override implicit val ec: ExecutionC
       .toFuture.map(Option(_))
   }
 
-  def buyRewardFor(volunteerId: String, rewardId: String): Future[Option[UpdateResult]] = {
+  def buyRewardFor(volunteerId: String, reward: Reward): Future[Option[Volunteer]] = {
     val volunteerObjId = new ObjectId(volunteerId)
-    val rewardObjId = new ObjectId(rewardId)
-    collection.updateOne(equal(fId, volunteerObjId), addEachToSet("rewardIds", rewardObjId))
-      .toFuture.map(Option(_))
+    val upd1 = addEachToSet("rewardIds", reward._id)
+    val upd2 = inc("balance", -reward.price)
+    for {
+      _ ← collection.updateOne(equal(fId, volunteerObjId), upd1).toFuture
+      _ ← collection.updateOne(equal(fId, volunteerObjId), upd2).toFuture
+      v ← findById(volunteerId)
+    } yield v
   }
 
   def createVolunteer(volunteer: Volunteer): Future[Volunteer] = {
