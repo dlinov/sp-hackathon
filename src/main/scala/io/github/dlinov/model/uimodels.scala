@@ -1,5 +1,6 @@
 package io.github.dlinov.model
 
+import io.github.dlinov.model.ui.UiProject
 import org.bson.types.ObjectId
 import org.mongodb.scala.bson.ObjectId
 
@@ -59,3 +60,7 @@ object UiReward {
 case class UiNewReward(title: String, price: Int, code: Option[String]) {
   def toReward = Reward(ObjectId.get(), title, price, code)
 }
+
+case class UiOrganization(id: ObjectId, title: String, projects: Seq[UiProject])
+
+case class UiNewOrganization(title: String, email: String, password: String)

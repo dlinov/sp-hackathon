@@ -1,5 +1,6 @@
 package io.github.dlinov.db.mongo
 
+import io.github.dlinov.model.MongoObject
 import org.bson.types.ObjectId
 import org.mongodb.scala.bson.collection.immutable.Document
 import org.mongodb.scala.bson.conversions.Bson
@@ -9,7 +10,7 @@ import org.mongodb.scala.{Completed, MongoCollection, MongoDatabase}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.reflect.ClassTag
 
-abstract class MongoDao[T](db: MongoDatabase) {
+abstract class MongoDao[T <: MongoObject](db: MongoDatabase) {
   import MongoDao.FieldNames._
 
   implicit def classTag: ClassTag[T]
@@ -41,6 +42,10 @@ abstract class MongoDao[T](db: MongoDatabase) {
   def insert(obj: T): Future[Completed] = {
     collection.insertOne(obj).toFuture()
   }
+
+//  def updateOne(obj: T) = {
+//    collection.findOneAndUpdate(equal(fId, obj._id), obj)
+//  }
 }
 
 object MongoDao {

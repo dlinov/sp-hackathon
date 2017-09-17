@@ -4,6 +4,10 @@ import java.util.UUID
 
 import org.mongodb.scala.bson.ObjectId
 
+trait MongoObject {
+  val _id: ObjectId
+}
+
 case class Organization(_id: ObjectId, taskIds: Seq[ObjectId])
 
 case class Project(_id: ObjectId,
@@ -12,11 +16,11 @@ case class Project(_id: ObjectId,
                    price: Int,
                    bonus: String,
                    isFinished: Boolean,
-                   volunteerIds: Seq[ObjectId])
+                   volunteerIds: Seq[ObjectId]) extends MongoObject
 
-case class Reward(_id: ObjectId, title: String, price: Int, code: Option[String])
+case class Reward(_id: ObjectId, title: String, price: Int, code: Option[String]) extends MongoObject
 
-case class Sponsor(_id: ObjectId, rewardIds: Seq[ObjectId])
+case class Sponsor(_id: ObjectId, rewardIds: Seq[ObjectId]) extends MongoObject
 
 case class User(
                  _id: ObjectId,
@@ -25,6 +29,6 @@ case class User(
                  firstName: String,
                  lastName: String,
                  accounts: Seq[UUID]
-               )
+               ) extends MongoObject
 
-case class Volunteer(_id: ObjectId, completedTaskIds: ObjectId)
+case class Volunteer(_id: ObjectId, completedTaskIds: ObjectId, balance: Int) extends MongoObject

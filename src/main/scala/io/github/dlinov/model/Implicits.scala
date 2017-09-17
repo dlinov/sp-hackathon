@@ -24,4 +24,10 @@ object Implicits {
       volunteerIds = p.volunteerIds.map(_.toString)
     )
   }
+
+  implicit class OrganizationConverter(o: Organization) {
+    def asUI: UiOrganization(
+
+    )
+  }
 }

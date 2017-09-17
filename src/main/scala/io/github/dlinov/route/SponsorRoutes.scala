@@ -31,10 +31,6 @@ trait SponsorRoutes extends JsonSupport {
   lazy val rewardDao = new RewardsMongoDao(db)
   lazy val usersDao = new UsersMongoDao(db)
 
-  @ApiOperation(httpMethod = "GET", response = classOf[UiUser], value = "Returns an user based on ID")
-  @ApiImplicitParams(Array(
-    new ApiImplicitParam(name = "userId", required = false, dataType = "string", paramType = "path", value = "ID of user that needs to be fetched")
-  ))
   lazy val sponsorRoutes: Route =
     pathPrefix("sponsors") {
       concat(
