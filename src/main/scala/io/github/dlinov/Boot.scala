@@ -44,7 +44,9 @@ object Boot extends App with AppSettings with UserRoutes with VkApi with Project
 
   lazy val routess: Route = respondWithHeaders(
     new RawHeader("Access-Control-Allow-Origin", "*"),
-    new RawHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    new RawHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"),
+    new RawHeader("Access-Control-Max-Age", "86400"),
+    new RawHeader("Access-Control-Allow-Headers", "Content-Type")
   ) {
     concat(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, volunteerRoutes, vkRoutes, SwaggerDocService.routes)
   }
