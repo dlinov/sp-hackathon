@@ -21,8 +21,12 @@ trait VkApi {
       path("url") {
         complete(authUrl())
       } ~ path("post") {
-        postVk("lalala")
-        complete("ok")
+        post {
+          entity(as[String]) { text =>
+            postVk(text)
+            complete("ok")
+          }
+        }
       } ~ pathPrefix("auth") {
         parameter('access_token, 'user_id.as[Int]) { (access_token, userId) =>
           user = new UserActor(userId, access_token)

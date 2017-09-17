@@ -1,6 +1,9 @@
 package io.github.dlinov.social
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import akka.stream.ActorMaterializer
 import com.vk.api.sdk.client.VkApiClient
 import com.vk.api.sdk.client.actors.{GroupActor, ServiceActor, UserActor}
 import com.vk.api.sdk.httpclient.HttpTransportClient
@@ -13,6 +16,8 @@ class VkPoster(
   executionContext: ExecutionContext) {
 
   import scala.collection.JavaConversions._
+
+  implicit val materializer = ActorMaterializer()
 
   val vk = new VkApiClient(new HttpTransportClient())
   val apiAccessToken = "daa29725daa29725daa297251ddafcfef3ddaa2daa29725831cc52b78bdba9c2ad5cfdf"
@@ -51,7 +56,8 @@ class VkPoster(
         |
         |Ждем ваших откликов!
       """.stripMargin
-    vk.wall().post(user).ownerId(-153608838).fromGroup(true).message(text).execute()
+    val s: HttpRequest = HttpRequest(method = HttpMethods.POST,uri = "http://02bc1c3a.ngrok.io/vk/post").withEntity(text)
+    Http().singleRequest(s)
   }
 
   def getTopic(groupId: Integer, id: Int): String = {
