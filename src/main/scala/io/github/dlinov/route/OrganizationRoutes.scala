@@ -9,7 +9,6 @@ import akka.util.Timeout
 import io.github.dlinov.db.mongo.{OrganizationsMongoDao, ProjectsMongoDao, UsersMongoDao}
 import io.github.dlinov.json.JsonSupport
 import io.github.dlinov.model.{UiNewOrganization, User}
-import io.github.dlinov.model.Implicits.OrganizationConverter
 import org.bson.types.ObjectId
 import org.mongodb.scala.MongoDatabase
 

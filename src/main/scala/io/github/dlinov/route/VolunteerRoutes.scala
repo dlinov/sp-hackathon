@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.directives.PathDirectives.path
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
-import io.github.dlinov.db.mongo.{ProjectsMongoDao, VolunteersMongoDao}
+import io.github.dlinov.db.mongo.{ProjectsMongoDao, RewardsMongoDao, UsersMongoDao, VolunteersMongoDao}
 import io.github.dlinov.json.JsonSupport
 import io.github.dlinov.model.UiVolunteerApplication
 import org.mongodb.scala.MongoDatabase
@@ -27,6 +27,8 @@ trait VolunteerRoutes extends JsonSupport {
   val db: MongoDatabase
   private lazy val volunteersDao = new VolunteersMongoDao(db)
   private lazy val projectsDao = new ProjectsMongoDao(db)
+  private lazy val rewardsDao = new RewardsMongoDao(db)
+  private lazy val usersDao = new UsersMongoDao(db)
 
   lazy val volunteerRoutes: Route = pathPrefix("volunteers") {
     concat(
@@ -41,14 +43,35 @@ trait VolunteerRoutes extends JsonSupport {
             }
           }
         }
-      }/*,
+      },
+      path(Segment / "buy" / Segment) { (volunteerId, rewardId) ⇒
+        post {
+          complete {
+            for {
+              _ ← volunteersDao.buyRewardFor(volunteerId, rewardId)
+              _ ← rewardsDao.assignVolunteerForReward(volunteerId, rewardId)
+            } yield ""
+          }
+        }
+      },
       pathEnd {
         get {
           complete {
-            volunteersDao.findAll.map(_.asUI())
+            for {
+              users ← usersDao.findAll
+              volunteers ← volunteersDao.findAll
+              projects ← projectsDao.findAll
+            } yield volunteers.flatMap(v ⇒ {
+              for {
+                user ← users.find(_._id == v._id)
+              } yield {
+                val userProjects = projects.filter(_.volunteerIds.contains(v._id)).map(_.asUI)
+                v.asUI(user, userProjects)
+              }
+            })
           }
         }
-      }*/
+      }
     )
   }
 

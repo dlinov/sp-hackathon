@@ -21,7 +21,8 @@ case class UiVolunteer(
                         email: String,
                         password: String,
                         firstName: String,
-                        lastName: String
+                        lastName: String,
+                        balance: Int
                       )
 
 case class UiSponsor(
@@ -46,6 +47,21 @@ object UiSponsor {
   }
 }
 
+case class UiNewSponsor(email: String, password: String, title: String) {
+  def toSponsor(userId: ObjectId): Sponsor = Sponsor(
+    _id = userId,
+    rewardIds = Seq.empty
+  )
+
+  def toUser = User(
+    _id = ObjectId.get,
+    email = email,
+    password = password,
+    firstName = title,
+    lastName = ""
+  )
+}
+
 case class UiReward(
                      id: String, title: String, price: Int, code: Option[String]
                    )
@@ -58,7 +74,7 @@ object UiReward {
 }
 
 case class UiNewReward(title: String, price: Int, code: Option[String]) {
-  def toReward = Reward(ObjectId.get(), title, price, code)
+  def toReward = Reward(ObjectId.get(), title, price, code, volunteerId = None)
 }
 
 case class UiOrganization(id: String, title: String, balance: Int, projects: Seq[UiProject])

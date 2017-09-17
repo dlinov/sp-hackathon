@@ -9,7 +9,7 @@ import akka.http.scaladsl.server.{PathMatchers, Route}
 import akka.util.Timeout
 import io.github.dlinov.db.mongo.{RewardsMongoDao, SponsorsMongoDao, UsersMongoDao}
 import io.github.dlinov.json.JsonSupport
-import io.github.dlinov.model.{UiNewReward, UiNewUser, UiSponsor, UiUser}
+import io.github.dlinov.model._
 import io.swagger.annotations._
 import org.mongodb.scala.MongoDatabase
 
@@ -54,6 +54,19 @@ trait SponsorRoutes extends JsonSupport {
                   } yield UiSponsor.apply2(user, rewards)
                   x.run
                 }
+              }
+            }
+          }
+        },
+        pathEnd {
+          post {
+            entity(as[UiNewSponsor]) { uiSponsor ⇒
+              complete {
+                for {
+                  createdUser ← usersDao.createUser(uiSponsor.toUser)
+                  sponsor = uiSponsor.toSponsor(createdUser._id)
+                  _ ← sponsorsDao.insert(sponsor)
+                } yield sponsor.asUI(createdUser, rewards = Seq.empty)
               }
             }
           }

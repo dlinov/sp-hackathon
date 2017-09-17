@@ -22,6 +22,13 @@ class VolunteersMongoDao(db: MongoDatabase)(override implicit val ec: ExecutionC
       .toFuture.map(Option(_))
   }
 
+  def buyRewardFor(volunteerId: String, rewardId: String): Future[Option[UpdateResult]] = {
+    val volunteerObjId = new ObjectId(volunteerId)
+    val rewardObjId = new ObjectId(rewardId)
+    collection.updateOne(equal(fId, volunteerObjId), addEachToSet("rewardIds", rewardObjId))
+      .toFuture.map(Option(_))
+  }
+
   def createVolunteer(volunteer: Volunteer): Future[Volunteer] = {
     // volunteer is expected to have unique (user) id
     insert(volunteer).map(_ ⇒ volunteer)

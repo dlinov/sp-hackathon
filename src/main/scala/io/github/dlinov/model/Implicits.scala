@@ -41,6 +41,18 @@ object Implicits {
       email = user.email,
       password = user.password,
       firstName = user.firstName,
+      lastName = user.lastName,
+      balance = v.balance
+    )
+  }
+
+
+  implicit class SponsorConverter(s: Sponsor) {
+    def asUI(user: User, rewards: Seq[UiReward]): UiSponsor = UiSponsor(
+      id = s._id.toString,
+      rewards = rewards,
+      email = user.email,
+      firstName = user.firstName,
       lastName = user.lastName
     )
   }

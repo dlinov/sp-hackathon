@@ -30,7 +30,7 @@ class ProjectsMongoDao(db: MongoDatabase)
   }
 
   def finishProject(projectId: String): Future[Option[Project]] = {
-    collection.findOneAndUpdate(equal(fId, projectId), set("isFinished", true))
+    collection.findOneAndUpdate(equal(fId, new ObjectId(projectId)), set("isFinished", true))
       .toFuture().map(Option(_))
   }
 }
