@@ -4,9 +4,11 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.server.Directives.concat
+import akka.http.scaladsl.server.directives.RespondWithDirectives._
 import akka.http.scaladsl.server.Route
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import akka.http.scaladsl.model.headers.CustomHeader
 import com.github.swagger.akka.SwaggerHttpService
 import io.github.dlinov.db.mongo.ModelMongoCodecs
 import io.github.dlinov.route._
@@ -37,8 +39,29 @@ object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with
     override val apiDocsPath = "swagger" //where you want the swagger-json endpoint exposed
   }
 
-  lazy val routess: Route = concat(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, volunteerRoutes,
-    SwaggerDocService.routes)
+  val corsedRoutes = Seq(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, volunteerRoutes)//.map(route ⇒ cors()(route))
+  lazy val routess: Route = respondWithHeaders(
+    new CustomHeader {
+      override def name() = "Access-Control-Allow-Origin"
+
+      override def value() = "*"
+
+      override def renderInRequests() = true
+
+      override def renderInResponses() = true
+    },
+    new CustomHeader {
+      override def name() = "Access-Control-Allow-Methods"
+
+      override def value() = "GET, POST, PUT, DELETE, OPTIONS"
+
+      override def renderInRequests() = true
+
+      override def renderInResponses() = true
+    }
+  ) {
+    concat(corsedRoutes: _*/*, SwaggerDocService.routes*/)
+  }
 
   val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routess, host, port)
   serverBindingFuture.onComplete {

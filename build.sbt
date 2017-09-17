@@ -17,6 +17,7 @@ lazy val root = (project in file(".")).
       "org.mongodb.scala"      %% "mongo-scala-driver"   % "2.1.0",
       "com.github.swagger-akka-http" %% "swagger-akka-http" % "0.11.0",
       "org.scalaz" %% "scalaz-core" % "7.2.15",
+//      "ch.megard" %% "akka-http-cors" % "0.2.1",
       "com.typesafe.akka"      %% "akka-http-testkit"    % akkaHttpVersion % Test,
       "org.scalatest"          %% "scalatest"            % "3.0.1"         % Test
     )
