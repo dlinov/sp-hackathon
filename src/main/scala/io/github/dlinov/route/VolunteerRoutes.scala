@@ -47,10 +47,10 @@ trait VolunteerRoutes extends JsonSupport {
       path(Segment / "buy" / Segment) { (volunteerId, rewardId) ⇒
         post {
           complete {
-            for {
-              reward ← rewardsDao.assignVolunteerForReward(volunteerId, rewardId)
-              _ ← volunteersDao.buyRewardFor(volunteerId, reward)
-            } yield ""
+            (for {
+              reward ← OptionT(rewardsDao.assignVolunteerForReward(volunteerId, rewardId))
+              _ ← OptionT(volunteersDao.buyRewardFor(volunteerId, reward))
+            } yield "").run
           }
         }
       },
