@@ -10,6 +10,7 @@ import akka.util.Timeout
 import io.github.dlinov.db.mongo.{OrganizationsMongoDao, ProjectsMongoDao, VolunteersMongoDao}
 import io.github.dlinov.json.JsonSupport
 import io.github.dlinov.model.ui.UiNewProject
+import io.github.dlinov.social.VkPoster
 import io.swagger.annotations.Api
 import org.mongodb.scala.MongoDatabase
 
@@ -25,6 +26,9 @@ trait ProjectRoutes extends JsonSupport {
   implicit def system: ActorSystem
   implicit def executionContext: ExecutionContext
   implicit def timeout: Timeout
+
+  val vkPoster: VkPoster
+  import vkPoster._
 
   val db: MongoDatabase
   lazy val projectsDao = new ProjectsMongoDao(db)
@@ -58,6 +62,7 @@ trait ProjectRoutes extends JsonSupport {
             post {
               entity(as[UiNewProject]) { project ⇒
                 complete {
+                  postVk(project.toProject)
                   for {
                     createdProject ← projectsDao.createProject(project.toProject)
                     _ ← organizationsDao.addProjectToOrganization(project.organizationId, createdProject._id)

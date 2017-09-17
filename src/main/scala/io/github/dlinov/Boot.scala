@@ -11,6 +11,8 @@ import akka.util.Timeout
 import akka.http.scaladsl.model.headers.RawHeader
 import com.github.swagger.akka.SwaggerHttpService
 import io.github.dlinov.db.mongo.ModelMongoCodecs
+import io.github.dlinov.route.{ProjectRoutes, SponsorRoutes, UserRoutes, VkApi}
+import io.github.dlinov.social.VkPoster
 import io.github.dlinov.route._
 import org.mongodb.scala.MongoClient
 
@@ -18,13 +20,14 @@ import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with SponsorRoutes with OrganizationRoutes
+object Boot extends App with AppSettings with UserRoutes with VkApi with ProjectRoutes with SponsorRoutes with OrganizationRoutes
   with VolunteerRoutes {
   implicit val system: ActorSystem = ActorSystem("sp-system")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
   implicit val executionContext: ExecutionContext = system.dispatcher
   implicit lazy val timeout: Timeout = Timeout(20.seconds)
 
+  val vkPoster = new VkPoster()
   val host = "0.0.0.0"
   val dbName = mongodbUri.split("/").last
   val mongoClient: MongoClient = MongoClient(mongodbUri)
@@ -43,7 +46,7 @@ object Boot extends App with AppSettings with UserRoutes with ProjectRoutes with
     new RawHeader("Access-Control-Allow-Origin", "*"),
     new RawHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
   ) {
-    concat(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, volunteerRoutes, SwaggerDocService.routes)
+    concat(userRoutes, projectRoutes, sponsorRoutes, organizationRoutes, volunteerRoutes, vkRoutes, SwaggerDocService.routes)
   }
 
   val serverBindingFuture: Future[ServerBinding] = Http().bindAndHandle(routess, host, port)
