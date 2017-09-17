@@ -73,7 +73,7 @@ object UiReward {
   }
 }
 
-case class UiNewReward(title: String, price: Int, code: Option[String]) {
+case class UiNewReward(sponsorId: String, title: String, price: Int, code: Option[String]) {
   def toReward = Reward(ObjectId.get(), title, price, code, volunteerId = None)
 }
 

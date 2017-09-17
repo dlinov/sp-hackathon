@@ -56,4 +56,11 @@ object Implicits {
       lastName = user.lastName
     )
   }
+
+  implicit class RewardConverter(r: Reward) {
+    def asUI: UiReward = UiReward(
+      r._id.toString,
+      r.title, r.price, r.code
+    )
+  }
 }

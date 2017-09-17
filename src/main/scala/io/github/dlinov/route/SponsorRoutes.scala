@@ -37,8 +37,15 @@ trait SponsorRoutes extends JsonSupport {
         path("reward") {
           post {
             entity(as[UiNewReward]) { reward ⇒
-              rewardDao.insert(reward.toReward)
-              complete("done")
+              complete {
+                val newReward = reward.toReward
+                val x = for {
+                  sponsor <- OptionT(sponsorsDao.findById(reward.sponsorId))
+                  _ <- OptionT(rewardDao.insert(newReward).map(Option(_)))
+                  _ <- OptionT(sponsorsDao.setRewardsToSponsor(sponsor._id.toString, newReward._id +: sponsor.rewardIds))
+                } yield newReward.asUI
+                x.run
+              }
             }
           }
         },
