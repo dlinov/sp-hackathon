@@ -62,7 +62,7 @@ trait ProjectRoutes extends JsonSupport {
             post {
               entity(as[UiNewProject]) { project ⇒
                 complete {
-                  postVk(project.toProject)
+//                  postVk(project.toProject)
                   for {
                     createdProject ← projectsDao.createProject(project.toProject)
                     _ ← organizationsDao.addProjectToOrganization(project.organizationId, createdProject._id)
